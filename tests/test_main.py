@@ -8,22 +8,24 @@ from ipynbtopdf import main
 def test_dir():
     return Path(__file__).parent
 
-
 @pytest.fixture
-def test_file(test_dir):
-    return test_dir / 'test_file.ipynb'
+def test_notebook(test_dir):
+    return test_dir / 'test_notebook.ipynb'
 
+@pytest.fixture()
+def test_latex(test_dir):
+    return test_dir / 'test_latex.tex'
 
-def test_notebook_to_latex(test_file):
+def test_notebook_to_latex(test_notebook):
     latex_text, resources = main.notebook_to_latex(
-        notebook_path=test_file
+        notebook_path=test_notebook
     )
     assert "Привет" in latex_text
     assert resources['outputs']
 
 
-def test_save_outputs(test_dir, test_file):
-    latex_text, resources = main.notebook_to_latex(test_file)
+def test_save_outputs(test_dir, test_notebook):
+    latex_text, resources = main.notebook_to_latex(test_notebook)
     outputs = resources['outputs']
     main.save_outputs(
         outputs=outputs,
@@ -36,8 +38,8 @@ def test_save_outputs(test_dir, test_file):
         (test_dir  / output).unlink()
 
 
-def test_set_cyrillic_friendly_font(test_file):
-    latex_text, resources = main.notebook_to_latex(test_file)
+def test_set_cyrillic_friendly_font(test_notebook):
+    latex_text, _ = main.notebook_to_latex(test_notebook)
     new_latex = main.set_cyrillic_friendly_font(
         latex_text=latex_text, font="Arial"
     )
@@ -45,10 +47,23 @@ def test_set_cyrillic_friendly_font(test_file):
     assert "Arial" in new_latex
 
 
-def test_add_full_path_to_outputs(test_dir, test_file):
-    latex_text, resources = main.notebook_to_latex(test_file)
-    main.add_full_path_to_outputs(
+def test_add_full_path_to_outputs(test_dir, test_notebook):
+    latex_text, resources = main.notebook_to_latex(test_notebook)
+    updated_latex = main.add_full_path_to_outputs(
         latex_text=latex_text,
-        outputs_names=[name for name in resources['output']],
+        outputs_names=[name for name in resources['outputs']],
         outputs_dir=test_dir
     )
+    assert str(test_dir) in updated_latex
+
+
+def test_save_latex(test_latex, test_notebook, test_dir):
+    latex_text, resources = main.notebook_to_latex(test_notebook)
+    updated_latex = main.add_full_path_to_outputs(
+        latex_text=latex_text,
+        outputs_names=[name for name in resources['outputs']],
+        outputs_dir=test_dir
+    )
+    main.save_latex(updated_latex, test_latex)
+    assert Path(test_latex).exists
+    # Path(test_latex).unlink()
