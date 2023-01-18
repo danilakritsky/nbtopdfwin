@@ -1,0 +1,15 @@
+[tool.poetry]
+name = "ipynbtopdf"
+version = "0.1.0"
+description = ""
+authors = ["Danila Kritsky <danilakritsky@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+nbconvert = "^7.2.8"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
