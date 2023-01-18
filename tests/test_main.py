@@ -41,9 +41,9 @@ def test_save_outputs(test_dir, test_notebook):
 def test_set_cyrillic_friendly_font(test_notebook):
     latex_text, _ = main.notebook_to_latex(test_notebook)
     new_latex = main.set_cyrillic_friendly_font(
-        latex_text=latex_text, font="Arial"
+        latex_text=latex_text, main_font="Arial"
     )
-    
+
     assert "Arial" in new_latex
 
 
@@ -54,16 +54,25 @@ def test_add_full_path_to_outputs(test_dir, test_notebook):
         outputs_names=[name for name in resources['outputs']],
         outputs_dir=test_dir
     )
-    assert str(test_dir) in updated_latex
+    assert test_dir.as_posix() in updated_latex
 
 
 def test_save_latex(test_latex, test_notebook, test_dir):
     latex_text, resources = main.notebook_to_latex(test_notebook)
-    updated_latex = main.add_full_path_to_outputs(
+    latex_text = main.set_cyrillic_friendly_font(latex_text)
+    latex_text = main.add_full_path_to_outputs(
         latex_text=latex_text,
         outputs_names=[name for name in resources['outputs']],
         outputs_dir=test_dir
     )
-    main.save_latex(updated_latex, test_latex)
+    main.save_outputs(
+        outputs=resources['outputs'],
+        outputs_dir=test_dir
+    )
+    main.save_latex_to_file(
+        latex_text=latex_text,
+        path=test_latex
+    )
+    
     assert Path(test_latex).exists
-    # Path(test_latex).unlink()
+    Path(test_latex).unlink()

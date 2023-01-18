@@ -27,19 +27,24 @@ def save_outputs(outputs: dict[str, bytes], outputs_dir: str | Path = '.') -> No
 
 
 def set_cyrillic_friendly_font(
-        latex_text: str, font: str = "Calibri"
+        latex_text: str,
+        main_font: str = "Calibri",
+        mono_font: str = "Courier New"
 ) -> str:
     """
     Add a line to the latex text that would set a document font that
     supports cyrillic characters. Defaults to 'Calibri'.
     """
     # https://tex.stackexchange.com/questions/164520/cyrillic-font-for-xelatex-in-os-x
-    
-    DOCUMENT_BEGIN_SECTION: str = r"\begin{document}"
+    # https://tex.stackexchange.com/questions/352804/setmainfont-vs-fontspec
+    DOCUMENT_BEGIN_SECTION: str = "\\begin{document}\n"
     return latex_text.replace(
         DOCUMENT_BEGIN_SECTION,
+        # mono spaced font that supports cyrillic characters
+        # https://tex.stackexchange.com/questions/264544/courier-font-just-not-working
         DOCUMENT_BEGIN_SECTION + (
-            "\n" + chr(32) * 4 + r"\setmainfont" + "{" + font + "}" + "\n"
+            f"{chr(32) * 4} \\setmainfont{{{main_font}}}\n"
+            f"{chr(32) * 4} \\setmonofont{{{mono_font}}}\n"
         )
     )
 
@@ -54,12 +59,15 @@ def add_full_path_to_outputs(
     for cur_filename in outputs_names:
         latex_text = latex_text.replace(
             f'{{{cur_filename }}}',
-            f'{{{str(outputs_dir / cur_filename)}}}'
+            # NOTE: replace forward slashes with backslashes
+            # since xelatex will not work if there are pathes with back slashes
+            # in files on Windows
+            f'{{{(outputs_dir / cur_filename).as_posix()}}}'
         )
     return latex_text
 
 
-def save_latex(latex_text: str, path: str | Path) -> None:
+def save_latex_to_file(latex_text: str, path: str | Path) -> None:
     "Save latex text to file."
     with open(path, 'w', encoding='utf-8') as f:
         f.write(latex_text)
