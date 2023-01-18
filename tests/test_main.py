@@ -73,6 +73,32 @@ def test_save_latex(test_latex, test_notebook, test_dir):
         latex_text=latex_text,
         path=test_latex
     )
-    
+
     assert Path(test_latex).exists
     Path(test_latex).unlink()
+
+def test_convert_latex_to_pdf(test_dir, test_notebook, test_latex):
+    latex_text, resources = main.notebook_to_latex(test_notebook)
+    latex_text = main.set_cyrillic_friendly_font(latex_text)
+    latex_text = main.add_full_path_to_outputs(
+        latex_text=latex_text,
+        outputs_names=[name for name in resources['outputs']],
+        outputs_dir=test_dir
+    )
+    main.save_outputs(
+        outputs=resources['outputs'],
+        outputs_dir=test_dir
+    )
+    main.save_latex_to_file(
+        latex_text=latex_text,
+        path=test_latex
+    )
+
+    main.convert_latex_to_pdf(
+        latex_file=test_latex,
+        output_dir=test_dir,
+        clear_files=True
+    )
+
+    assert (test_dir / f'{test_latex.stem}.pdf').exists()
+    assert not (test_dir / f'{test_latex.stem}.out').exists()

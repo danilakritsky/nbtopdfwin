@@ -1,5 +1,6 @@
 from pathlib import Path
 from typing import Iterable
+import subprocess
 
 import nbformat
 from nbconvert import LatexExporter
@@ -71,3 +72,22 @@ def save_latex_to_file(latex_text: str, path: str | Path) -> None:
     "Save latex text to file."
     with open(path, 'w', encoding='utf-8') as f:
         f.write(latex_text)
+
+
+def convert_latex_to_pdf(
+    latex_file: str | Path,
+    output_dir: str | Path | None = '.',
+    clear_files: bool = False
+) -> None:
+    """Convert a latex file to pdf."""
+    cmd: str = "xelatex"
+    if not output_dir:
+        output_dir = '.'
+    cmd = f"{cmd} -output-directory {output_dir} {latex_file}"
+    
+    subprocess.run(cmd)
+
+    if clear_files:
+        for file in output_dir.glob(f"*{latex_file.stem}*"):
+            if file.suffix not in ('.tex', '.pdf'):
+                file.unlink()
