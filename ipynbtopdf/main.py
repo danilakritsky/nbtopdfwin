@@ -3,10 +3,10 @@ from pathlib import Path
 import nbformat
 from nbconvert import LatexExporter
 
-def notebook_to_latex(notebook: str | Path) -> tuple[str, dict]:
+def notebook_to_latex(notebook_path: str | Path) -> tuple[str, dict]:
     "Convert notebook to latex and return its content and additional data."
     notebook_node = nbformat.read(
-        notebook,
+        notebook_path,
         as_version=4
     )
     exporter: LatexExporter = LatexExporter()
@@ -17,11 +17,11 @@ def notebook_to_latex(notebook: str | Path) -> tuple[str, dict]:
     return latex_text, resources
 
 
-def save_outputs(outputs: dict[str, bytes], dir: str | Path = '.') -> None:
+def save_outputs(outputs: dict[str, bytes], outputs_dir: str | Path = '.') -> None:
     "Save each output to a file."
     cur_output: str
     for cur_output in outputs:
-        with open(Path(dir) / cur_output, 'wb') as f:
+        with open(Path(outputs_dir) / cur_output, 'wb') as f:
             f.write(outputs[cur_output])
 
 
@@ -41,3 +41,11 @@ def set_cyrillic_friendly_font(
             "\n" + chr(32) * 4 + r"\setmainfont" + "{" + font + "}" + "\n"
         )
     )
+
+
+def add_full_path_to_outputs(
+    latex_text: str,
+    outputs_names: list[str],
+    outputs_dir: str | Path
+) -> str:
+    pass
