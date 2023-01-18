@@ -15,16 +15,23 @@ def test_file(test_folder):
 
 
 def test_notebook_to_latex(test_file):
-    body, resources = main.notebook_to_latex(test_file)
-    assert "Привет" in body
+    latex_text, resources = main.notebook_to_latex(test_file)
+    assert "Привет" in latex_text
     assert resources['outputs']
 
 
 def test_save_outputs(test_folder, test_file):
-    body, resources = main.notebook_to_latex(test_file)
+    latex_text, resources = main.notebook_to_latex(test_file)
     main.save_outputs(resources['outputs'], dir=test_folder)
     
     output: str
     for output in resources['outputs']:
         assert (test_folder  / output).exists
         (test_folder  / output).unlink()
+
+
+def test_set_cyrillic_friendly_font(test_file):
+    latex_text, resources = main.notebook_to_latex(test_file)
+    new_latex = main.set_cyrillic_friendly_font(latex_text, font="Arial")
+    
+    assert "Arial" in new_latex
