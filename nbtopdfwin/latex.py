@@ -6,7 +6,7 @@ from nbconvert import LatexExporter
 
 
 class Latex:
-    def __init__(self, text: str, resources: [str, dict]):
+    def __init__(self, text: str, resources: dict[str, dict]):
         self.text: str = text
         self.resources = resources
         # https://github.com/python/typing/issues/157
@@ -85,7 +85,7 @@ class Latex:
             self.outputs[cur_output] = Path(cur_output)
         self.outputs_saved = False
 
-    def add_full_path_to_outputs(self) -> None:
+    def add_full_path_to_outputs(self) -> str:
         """Replace each output filename in latex text with its full path."""
 
         updated_text: str = self.text

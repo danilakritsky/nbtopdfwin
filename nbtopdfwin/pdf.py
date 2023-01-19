@@ -25,7 +25,7 @@ def convert_latex_to_pdf(
         if not latex.outputs_saved:
             latex.save_outputs()
 
-        latex_tempfile: NamedTemporaryFile = NamedTemporaryFile(
+        latex_tempfile = NamedTemporaryFile(
             mode="w", dir=pdf_dir, suffix=".tex", delete=False
         )
         latex_tempfile.close()
