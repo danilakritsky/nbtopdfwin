@@ -23,11 +23,19 @@ class Latex:
         """
         Convert notebook to latex and return its content and additional data.
         """
-
+        
         notebook_node = nbformat.read(
             notebook_path,
             as_version=4
         )
+
+        # NOTE: replace backslashes in markdown cells since are treated
+        # as control sequences in LaTeX 
+        cell: dict
+        for cell in notebook_node['cells']:
+            if cell['cell_type'] == 'markdown':
+                cell['source'] = cell['source'].replace('\\', '/')
+
         exporter: LatexExporter = LatexExporter()
         text: str
         resources: dict
