@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "ipynbtopdf"
+name = "nbtopdfwin"
 version = "0.1.0"
 description = ""
 authors = ["Danila Kritsky <danilakritsky@gmail.com>"]

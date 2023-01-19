@@ -2,8 +2,8 @@ import pytest
 
 from pathlib import Path
 
-from ipynbtopdf.latex import Latex
-import ipynbtopdf.pdf as pdf
+from nbtopdfwin.latex import Latex
+import nbtopdfwin.pdf as pdf
 
 
 def test_convert_latex_to_pdf_saved_file(

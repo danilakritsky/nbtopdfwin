@@ -2,8 +2,8 @@ from pathlib import Path
 
 import pytest
 
-from ipynbtopdf.latex import Latex
-import ipynbtopdf.pdf as pdf
+from nbtopdfwin.latex import Latex
+import nbtopdfwin.pdf as pdf
 
 @pytest.fixture
 def test_dir():

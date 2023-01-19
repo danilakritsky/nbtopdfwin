@@ -2,7 +2,7 @@ from pathlib import Path
 
 import pytest
 
-from ipynbtopdf.latex import Latex
+from nbtopdfwin.latex import Latex
 
 
 def test_from_notebook(test_notebook):
