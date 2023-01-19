@@ -1,19 +1,15 @@
-import pytest
-
 from pathlib import Path
 
-from nbtopdfwin.latex import Latex
+import pytest
+
 import nbtopdfwin.pdf as pdf
+from nbtopdfwin.latex import Latex
 
 
-def test_convert_latex_to_pdf_saved_file(
-    test_dir, test_notebook, test_latex_file
-):
-    pdf_file = test_dir / f'{test_latex_file.stem}.pdf'
+def test_convert_latex_to_pdf_saved_file(test_dir, test_notebook, test_latex_file):
+    pdf_file = test_dir / f"{test_latex_file.stem}.pdf"
 
-    latex = Latex.from_notebook(
-        notebook_path=test_notebook
-    )
+    latex = Latex.from_notebook(notebook_path=test_notebook)
 
     latex.set_cyrillic_friendly_fonts()
     latex.save_outputs(test_dir)
@@ -25,27 +21,19 @@ def test_convert_latex_to_pdf_saved_file(
         clear_outputs=True,
     )
 
-    
     assert pdf_file.exists()
-    assert not (test_dir / f'{test_latex_file.stem}.out').exists()
-    
+    assert not (test_dir / f"{test_latex_file.stem}.out").exists()
+
     latex.delete_file()
     pdf_file.unlink()
-    
 
-def test_convert_latex_to_pdf_no_file(
-    test_dir, test_notebook, test_latex_file
-):
-    latex = Latex.from_notebook(
-        notebook_path=test_notebook
-    )
-    pdf.convert_latex_to_pdf(
-        latex=latex,
-        pdf_dir=test_dir
-    )
-    pdfs =  Path(test_dir).glob('*tmp*.pdf')
+
+def test_convert_latex_to_pdf_no_file(test_dir, test_notebook, test_latex_file):
+    latex = Latex.from_notebook(notebook_path=test_notebook)
+    pdf.convert_latex_to_pdf(latex=latex, pdf_dir=test_dir)
+    pdfs = Path(test_dir).glob("*tmp*.pdf")
     assert pdfs
     for pdf_file in pdfs:
         pdf_file.unlink()
 
-    assert Path(test_dir).glob('*.tex')
+    assert Path(test_dir).glob("*.tex")

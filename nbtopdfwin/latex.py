@@ -11,44 +11,36 @@ class Latex:
         self.resources = resources
         # https://github.com/python/typing/issues/157
         self.outputs: dict[str, Path] = {
-            output: Path(output)
-            for output in self.resources['outputs']
+            output: Path(output) for output in self.resources["outputs"]
         }
         self.outputs_saved: bool = False
         self.path: Path | None = None
 
-
     @classmethod
-    def from_notebook(cls, notebook_path: str | Path) -> 'Latex':
+    def from_notebook(cls, notebook_path: str | Path) -> "Latex":
         """
         Convert notebook to latex and return its content and additional data.
         """
-        
-        notebook_node = nbformat.read(
-            notebook_path,
-            as_version=4
-        )
+
+        notebook_node = nbformat.read(notebook_path, as_version=4)
 
         # NOTE: replace backslashes in markdown cells since are treated
-        # as control sequences in LaTeX 
+        # as control sequences in LaTeX
         cell: dict
-        for cell in notebook_node['cells']:
-            if cell['cell_type'] == 'markdown':
-                cell['source'] = cell['source'].replace('\\', '/')
+        for cell in notebook_node["cells"]:
+            if cell["cell_type"] == "markdown":
+                cell["source"] = cell["source"].replace("\\", "/")
 
         exporter: LatexExporter = LatexExporter()
         text: str
         resources: dict
 
         text, resources = exporter.from_notebook_node(notebook_node)
-        
+
         return Latex(text, resources)
-    
 
     def set_cyrillic_friendly_fonts(
-            self,
-            main_font: str = "Calibri",
-            mono_font: str = "Courier New"
+        self, main_font: str = "Calibri", mono_font: str = "Courier New"
     ) -> None:
         """
         Add lines to the latex text that would set a document font that
@@ -63,28 +55,27 @@ class Latex:
             DOCUMENT_BEGIN_SECTION,
             # mono spaced font that supports cyrillic characters
             # https://tex.stackexchange.com/questions/264544/courier-font-just-not-working
-            DOCUMENT_BEGIN_SECTION + (
+            DOCUMENT_BEGIN_SECTION
+            + (
                 f"{chr(32) * 4} \\setmainfont{{{main_font}}}\n"
                 f"{chr(32) * 4} \\setmonofont{{{mono_font}}}\n"
-            )
+            ),
         )
 
         self.text = updated_latex
 
-
     def save_outputs(self, outputs_dir: str | Path | None = None) -> None:
         "Save each output to a file."
         if outputs_dir is None:
-            outputs_dir = Path('.')
+            outputs_dir = Path(".")
         cur_output: str
         for cur_output in self.outputs:
             if outputs_dir:
                 self.outputs[cur_output] = Path(outputs_dir) / cur_output
-            with open(self.outputs[cur_output], 'wb') as f:
-                f.write(self.resources['outputs'][cur_output])
+            with open(self.outputs[cur_output], "wb") as f:
+                f.write(self.resources["outputs"][cur_output])
         self.outputs_saved = True
 
-    
     def delete_outputs(self) -> None:
         "Delete all saved outputs."
         cur_output: str
@@ -94,7 +85,6 @@ class Latex:
             self.outputs[cur_output] = Path(cur_output)
         self.outputs_saved = False
 
-
     def add_full_path_to_outputs(self) -> None:
         """Replace each output filename in latex text with its full path."""
 
@@ -102,31 +92,29 @@ class Latex:
         cur_filename: Path
         for cur_file, cur_file_path in self.outputs.items():
             updated_text = updated_text.replace(
-                f'{{{cur_file}}}',
+                f"{{{cur_file}}}",
                 # NOTE: replace forward slashes with backslashes
                 # since xelatex will not work if there are pathes with back slashes
                 # in files on Windows
-                f'{{{cur_file_path.as_posix()}}}'
+                f"{{{cur_file_path.as_posix()}}}",
             )
 
         return updated_text
 
-
     def save_to_file(self, path: str | Path) -> None:
         """Save latex text to file."""
-        
+
         if isinstance(path, str):
             path = Path(path)
 
         if not self.outputs_saved:
             self.save_outputs()
-        
-        with open(path, 'w', encoding='utf-8') as f:
+
+        with open(path, "w", encoding="utf-8") as f:
             f.write(self.add_full_path_to_outputs())
-        
+
         self.path = path
 
-       
     def delete_file(self) -> None:
         """Save latex text to file."""
         if self.path:

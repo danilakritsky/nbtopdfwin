@@ -1,14 +1,14 @@
-
-from pathlib import Path
 import sys
+from pathlib import Path
 
 from .latex import Latex
 from .pdf import convert_latex_to_pdf
 
+
 def convert_notebook():
-    notebook_path: str = ''
-    output_pdf_name: str  = ''
-    output_pdf_dir: str = ''
+    notebook_path: str = ""
+    output_pdf_name: str = ""
+    output_pdf_dir: str = ""
 
     match len(sys.argv):
         case 1:
@@ -24,22 +24,20 @@ def convert_notebook():
                 "Too many arguments. Only the following arguments are supported:\n"
                 "nbtopdfwin NOTEBOOK_PATH [OUTPUT_PDF_NAME] [OUTPUT_PDF_DIR]"
             )
-    
+
     latex = Latex.from_notebook(notebook_path)
     latex.set_cyrillic_friendly_fonts()
     if output_pdf_name:
-        latex.save_to_file(Path(output_pdf_name).stem + '.tex')
-    
+        latex.save_to_file(Path(output_pdf_name).stem + ".tex")
+
     if output_pdf_dir:
-        convert_latex_to_pdf(
-            latex, pdf_dir=output_pdf_dir, clear_outputs=True
-        )
+        convert_latex_to_pdf(latex, pdf_dir=output_pdf_dir, clear_outputs=True)
     else:
         convert_latex_to_pdf(latex, clear_outputs=True)
-    
+
     if output_pdf_name:
         latex.delete_file()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     convert_notebook()
